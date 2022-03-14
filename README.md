@@ -29,3 +29,19 @@ caddy run
 curl 127.0.0.1:2019/load -X POST -H "Content-Type: application/json" -d "$(cat /repos/caddy/caddy.json)"
 
 ```
+
+## Deployment
+
+ Before running docker-compose up, you will need to create the volume for caddy data.
+
+ ```
+ docker network create caddy-data
+ docker-compose up -d
+
+ docker exec -it caddy-config_caddy_1 ash
+
+ $ apk add curl
+ $ curl 127.0.0.1:2019/load -X POST -H "Content-Type: application/json" -d@/caddy-config/Caddyfile
+ ```
+
+
