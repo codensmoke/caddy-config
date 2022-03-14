@@ -1,0 +1,25 @@
+version: "3.2"
+
+services:
+  caddy:
+    image: caddy
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - /enigmablog/docroot:/enigmablog/docroot
+      - /IELTS/docroot:/IELTS/docroot
+      - /home/ubuntu/caddy-config/:/caddy-config/
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - webtraffic
+    tty: true
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
+
+networks:
+  webtraffic:
+    driver: bridge
