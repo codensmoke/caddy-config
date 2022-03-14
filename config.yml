@@ -1,0 +1,10 @@
+service:
+  - hostname: app.spotify-grinder.com
+    container: spotify-grinder_app:3000 # Docker container name
+  - hostname: chat.spotify-grinder.com
+    container: rocketchat_rocketchat_1:3000
+content:
+  - hostname: ielts.enigmablog.com #order is important
+    root: /IELTS/docroot
+  - hostname: enigmablog.com
+    root: /enigmablog/docroot

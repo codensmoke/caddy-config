@@ -1,0 +1,116 @@
+{
+	"apps": {
+		"pki": {
+			"certificate_authorities": {
+				"local": {
+					"name": "localcert",
+					"root": {
+						"certificate": "/data/localhost.crt",
+						"private_key":"/data/localhost.key"
+					}
+				}
+			}
+		},
+		"http": {
+			"servers": {
+				"localhost": {
+					"listen": [":443"],
+					"routes": [
+						{
+							"group": "default",
+							"handle": [{
+								"handler": "static_response",
+								"body": "Hello, world!\n"
+							}],
+							"match": [{
+							    "host": ["localhost"],
+								"protocol": "https",
+								"path": ["/" ,"/hello", "/hi", "/status"]
+							}]
+						},
+						{
+							"group": "correctSubdomainGroup",
+							"handle": [
+								{
+									"handler": "subroute",
+									"routes": [{
+										"handle": [
+											{
+												"handler": "vars",
+												"subdomain": ""
+											},
+											{
+												"handler": "vars",
+												"parsed_path": ""
+											}
+										]
+									}] 
+								},
+								{
+									"handler": "static_response",
+									"status_code": 302,
+									"headers": {
+										"Location": [
+											"https://{http.regexp.parsed_path.subdomain}.{http.request.host}/{http.regexp.parsed_path.path}"
+										]
+									}
+								}
+							],
+							"match": [{
+							    "host": ["localhost"],
+								"protocol": "https",
+								"path": ["/microservices" ,"/services", "/svc*"],
+								"path_regexp": {
+									"name": "parsed_path",
+									"pattern": "^\/[a-zA-Z0-9_-]+\/(?P<subdomain>[a-zA-Z0-9_-]+)\/(?P<path>[a-zA-Z0-9._?=&#-\/]*)"
+								}
+							}]
+						},
+						{
+							"group": "microservicesGroup",
+							"handle": [
+								{
+									"handler": "reverse_proxy",
+									"upstreams": [
+								 		{
+											"dial": "dfapi_api:7190"
+										}
+									],
+									"headers": {
+										"request": {
+											"set": {
+									        	"host": ["{http.reverse_proxy.upstream.hostport}"],
+              									"x-forwarded-host": ["{http.request.host}"]
+											}
+										}
+									},
+									"transport": {
+										"protocol": "http",
+										"tls": {
+											"client_certificate_file": "/repos/doughflow-api/office/doughflow-api.crt",
+											"client_certificate_key_file": "/repos/doughflow-api/office/doughflow-api.key",
+											"server_name": "dfapi_api",
+											"insecure_skip_verify": true
+										}
+									}
+								}
+							],
+							"match": [{
+							    "host": ["dfapi.localhost"],
+								"protocol": "https",
+								"path": ["/*", "/microservices", "/services"]
+							}]
+						}
+					],
+					"tls_connection_policies": [
+						{
+						    "match": {"sni": ["localhost", "dfapi.localhost"]},
+					        "default_sni": "localhost"
+						}
+					],
+					"strict_sni_host": true
+				}
+			}
+		}
+	}
+}
