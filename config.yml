@@ -1,8 +1,7 @@
 service:
   - hostname: app.spotify-grinder.com
     container: spotify-grinder_app:3000 # Docker container name
-    basic_auth: 1
-  - hostname: chat.smokencode.com
+  - hostname: chat.codensmoke.com
     container: rocketchat_rocketchat_1:3000
 content:
   - hostname: ielts.enigmablog.com #order is important
