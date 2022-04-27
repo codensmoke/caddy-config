@@ -14,7 +14,7 @@ services:
     networks:
       - webtraffic
       # to let prometheus collect metrics
-      - metrics_traffic
+      - metrics_statstraffic
     tty: true
 
 volumes:
@@ -25,5 +25,5 @@ volumes:
 networks:
   webtraffic:
     driver: bridge
-  metrics_traffic:
+  metrics_statstraffic:
     external: true
