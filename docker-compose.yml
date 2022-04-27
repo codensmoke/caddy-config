@@ -13,6 +13,8 @@ services:
       - caddy_config:/config
     networks:
       - webtraffic
+      # to let prometheus collect metrics
+      - metrics_traffic
     tty: true
 
 volumes:
@@ -23,3 +25,5 @@ volumes:
 networks:
   webtraffic:
     driver: bridge
+  metrics_traffic:
+    external: true
