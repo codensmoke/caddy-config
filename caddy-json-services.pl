@@ -126,7 +126,7 @@ sub add_auth_users {
     # are maintained in .env variables
     push @$users, {
         username => $_->{username},
-        password => $ENV{$_.'_password_hash'} // $ENV{'auth_password_hash'},
+        password => $ENV{$_->{username}.'_password_hash'} // $ENV{'auth_password_hash'},
     } for @$u;
 
 
