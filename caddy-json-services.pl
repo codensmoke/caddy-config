@@ -69,6 +69,7 @@ use Log::Any qw($log);
 use Path::Tiny;
 use JSON::MaybeUTF8 qw(:v1);
 use Sys::Hostname;
+use Dotenv -load;
 
 GetOptions(
     'b|base-path=s'      => \(my $base_path      = './'),
@@ -92,6 +93,7 @@ pod2usage(
 
 
 my $config = {};
+my $users = [];
 my $server;
 
 =head1 METHODS
@@ -118,13 +120,26 @@ sub add_http_server {
     $server = $config->{apps}{http}{servers}{$hostname};
 }
 
+sub add_auth_users {
+    my $u = shift;
+    # We expect passwords, and passwords hashs
+    # are maintained in .env variables
+    push @$users, {
+        username => $_->{username},
+        password => $ENV{$_.'_password_hash'} // $ENV{'auth_password_hash'},
+    } for @$u;
+
+
+}
+
 sub add_app {
     my %args = @_;
-    my ($type, $name, $port, $hostname, $path, $tls, $root) = map { $args{$_} } qw(type name port hostname path tls root);
+    my ($type, $name, $port, $hostname, $path, $tls, $root, $basic_auth) = map { $args{$_} } qw(type name port hostname path tls root basic_auth);
     ($name, $port) = split ':', $args{container} if exists $args{container};
     die ('Please add HTTP server before adding an App') unless defined $server;
     my $handles = [];
     my $matchers = [];
+    push @$handles, basic_auth_handler() if $basic_auth;
     push @$handles,
         $type eq 'service' ? reverse_proxy_handler($name, $port, $tls // 0) : (),
         $type eq 'content' ? file_server_handler($root) : ();
@@ -135,6 +150,18 @@ sub add_app {
         match => $matchers
     };
 
+}
+
+sub basic_auth_handler {
+    return {
+        handler => "authentication",
+        providers => {
+            http_basic => {
+                accounts => $users,
+                hash => { algorithm => 'bcrypt'},
+            }
+        }
+    };
 }
 
 sub reverse_proxy_handler {
@@ -169,9 +196,10 @@ sub matcher {
 
 my $config_file = LoadFile($config_path);
 add_http_server();
+add_auth_users($config_file->{user});
 for my $type (qw (service content)) {
     add_app(type => $type, $_->%*) for $config_file->{$type}->@*;
 }
 
 use Data::Dumper;
-$log->infof('Done | %s | %s', Dumper($config), encode_json_text($config));
+$log->infof('Done | %s | %s | %s', Dumper($config), encode_json_text($config), Dumper($users));
