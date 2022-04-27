@@ -3,6 +3,15 @@ service:
     container: spotify-grinder_app:3000 # Docker container name
   - hostname: chat.codensmoke.com
     container: rocketchat_rocketchat_1:3000
+  - hostname: prometheus.codensmoke.com
+    container: metrics_prometheus_1:9090
+    basic_auth: 1
+  - hostname: grafana.codensmoke.com
+    container: metrics_grafana_1:3000
+    basic_auth: 1
+  - hostname: pushgateway.codensmoke.com
+    container: metrics_pushgateway_1:9091
+    basic_auth: 1
 content:
   - hostname: ielts.enigmablog.com #order is important
     root: /IELTS/docroot
