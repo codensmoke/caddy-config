@@ -102,8 +102,8 @@ my $server;
 
 sub add_admin_section {
     $config->{admin} = {
-        listen => ":2019",
-        origins => ["caddy:2019", "caddy-config_caddy_1:2019"]
+        listen => "0.0.0.0:2020",
+        origins => ["127.0.0.1:2020", "caddy:2020", "caddy-config_caddy_1:2020", "localhost:2020", "0.0.0.0:2020"]
     };
 }
 
