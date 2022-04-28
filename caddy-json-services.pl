@@ -100,6 +100,13 @@ my $server;
 
 =cut
 
+sub add_admin_section {
+    $config->{admin} = {
+        listen => ":2019",
+        origins => ["caddy:2019", "caddy-config_caddy_1:2019"]
+    };
+}
+
 sub add_certificate_authority {
     my ($name, $crt, $key) = @_;
     $config->{apps}{pki}{certificate_authorities}{$name.'CA'} = {
@@ -195,6 +202,7 @@ sub matcher {
 }
 
 my $config_file = LoadFile($config_path);
+add_admin_section();
 add_http_server();
 add_auth_users($config_file->{user});
 for my $type (qw (service content)) {
