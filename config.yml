@@ -1,24 +1,39 @@
 service:
   - hostname: app.spotify-grinder.com
-    container: spotify-grinder_app:3000 # Docker container name
+    container: codensmoke-integration-external-api-1:8000 # Docker container name
+  - hostname: app.caaspay.com
+    container: test_api:8001
+  - hostname: api.caaspay.com
+    container: codensmoke-integration-external-api-1:8000
   - hostname: chat.codensmoke.com
-    container: rocketchat_rocketchat_1:3000
+    container: chat-rocketchat-1:3000
+  - hostname: chat.caaspay.com
+    container: chat-rocketchat-1:3000
+  - hostname: secure-chat.caaspay.com
+    container: chat-rocketchat-1:3000
   - hostname: prometheus.codensmoke.com
-    container: metrics_prometheus_1:9090
+    container: metrics-prometheus-1:9090
     basic_auth: 1
   - hostname: grafana.codensmoke.com
-    container: metrics_grafana_1:3000
+    container: metrics-grafana-1:3000
     basic_auth: 1
   - hostname: pushgateway.codensmoke.com
-    container: metrics_pushgateway_1:9091
+    container: metrics-pushgateway-1:9091
     basic_auth: 1
+  - hostname: test.digitalhippiez.com
+    container: codensmoke-integration-external-test-1:8000
+  - hostname: api.digitalhippiez.com
+    container: codensmoke-integration-external-api-1:8000
 content:
   - hostname: ielts.enigmablog.com #order is important
-    root: /IELTS/docroot
+    root: /FarmWeb/git/ielts.enigmablog/docroot
   - hostname: enigmablog.com
-    root: /enigmablog/docroot
+    root: /FarmWeb/git/enigmablog/docroot
+  - hostname: spotify-grinder.com
+    root: /FarmWeb/git/spotify-grinder/docroot
 user:
   - username: nael
   - username: mahrous
   - username: mahmoud
   - username: eamon
+  - username: wael
