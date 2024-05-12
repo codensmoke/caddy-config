@@ -177,7 +177,7 @@ sub reverse_proxy_handler {
         handler => "reverse_proxy",
         upstreams => [{dial => "$name:$port"}],
         headers => { request => { set => { 
-                    host => ["{http.reverse_proxy.upstream.hostport}"],
+                    host => ["{http.request.host}"],
                     'x-forwarded-host' => ["{http.request.host}"]
                 }}},
         $tls ? () : (),
@@ -211,3 +211,6 @@ for my $type (qw (service content)) {
 
 use Data::Dumper;
 $log->infof('Done | %s | %s | %s', Dumper($config), encode_json_text($config), Dumper($users));
+open my $fh, '>', $output_file;
+print $fh encode_json_utf8($config);
+close($fh);

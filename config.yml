@@ -24,6 +24,10 @@ service:
     container: codensmoke-integration-external-test-1:8000
   - hostname: api.digitalhippiez.com
     container: codensmoke-integration-external-api-1:8000
+  - hostname: caaspay.com
+    container: caaspay-wp-wordpress-1:80
+  - hostname: www.caaspay.com
+    container: caaspay-wp-wordpress-1:80
 content:
   - hostname: ielts.enigmablog.com #order is important
     root: /FarmWeb/git/ielts.enigmablog/docroot
